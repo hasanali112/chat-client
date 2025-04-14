@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react/jsx-sort-props */
 import { useState, ChangeEvent } from "react";
 import { Button } from "@heroui/button";
@@ -5,14 +6,19 @@ import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 import { useRegisterUserMutation } from "@/redux/features/auth/auth.api";
+import { verifyToken } from "@/helper/jwtHelper";
+import { useAppDispatch } from "@/redux/hook";
+import { setUser } from "@/redux/features/auth/auth.slice";
 
 const Register = () => {
   const { register, handleSubmit, reset } = useForm<FieldValues>();
   const [imageFile, setImageFile] = useState<File[] | []>([]);
   const [imagePreviews, setImagePreviews] = useState<string[] | []>([]);
   const [registerUser] = useRegisterUserMutation();
+  const dispatch = useAppDispatch();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
@@ -26,7 +32,11 @@ const Register = () => {
 
     try {
       const res = await registerUser(formData).unwrap();
-      console.log(res);
+      const user = verifyToken(res.data.accessToken);
+
+      dispatch(setUser({ user: user, token: res.data.accessToken }));
+
+      toast.success("Logged in", { duration: 2000 });
     } catch (error) {
       console.log(error);
     }

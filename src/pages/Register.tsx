@@ -21,7 +21,7 @@ const Register = () => {
 
     formData.append("data", JSON.stringify(data));
     for (const image of imageFile) {
-      formData.append("itemImages", image);
+      formData.append("image", image);
     }
 
     try {

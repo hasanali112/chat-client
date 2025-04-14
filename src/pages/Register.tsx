@@ -6,13 +6,30 @@ import { FiUpload } from "react-icons/fi";
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { useRegisterUserMutation } from "@/redux/features/auth/auth.api";
+
 const Register = () => {
   const { register, handleSubmit, reset } = useForm<FieldValues>();
   const [imageFile, setImageFile] = useState<File[] | []>([]);
   const [imagePreviews, setImagePreviews] = useState<string[] | []>([]);
+  const [registerUser] = useRegisterUserMutation();
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
+
+    const formData = new FormData();
+
+    formData.append("data", JSON.stringify(data));
+    for (const image of imageFile) {
+      formData.append("itemImages", image);
+    }
+
+    try {
+      const res = await registerUser(formData).unwrap();
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
     reset();
   };
 

@@ -1,13 +1,35 @@
+/* eslint-disable no-console */
 /* eslint-disable react/jsx-sort-props */
 import { Button } from "@heroui/button";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+
+import { verifyToken } from "@/helper/jwtHelper";
+import { useLoginMutation } from "@/redux/features/auth/auth.api";
+import { setUser } from "@/redux/features/auth/auth.slice";
+import { useAppDispatch } from "@/redux/hook";
 
 const Login = () => {
   const { register, handleSubmit, reset } = useForm<FieldValues>();
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      const res = await login(data).unwrap();
+      const user = verifyToken(res.data.accessToken);
+
+      dispatch(setUser({ user: user, token: res.data.accessToken }));
+
+      toast.success("Logged in", { duration: 2000 });
+      if (res.data.accessToken) {
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error);
+    }
     reset();
   };
 
@@ -40,7 +62,13 @@ const Login = () => {
               placeholder="Enter your email..."
             />
           </div>
-          <Button className="mt-5" color="primary" size="lg" type="submit">
+          <Button
+            isLoading={isLoading}
+            className="mt-5"
+            color="primary"
+            size="lg"
+            type="submit"
+          >
             Login
           </Button>
         </form>

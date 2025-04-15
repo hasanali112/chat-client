@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { useGetAllUserQuery } from "@/redux/features/auth/auth.api";
-import { useAppDispatch } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { addReceiverId } from "@/redux/features/chat/chatSlice";
 
 export interface IUser {
@@ -29,7 +29,12 @@ export interface IUser {
 const ChatSidebar = () => {
   const [selectedFilter] = useState("All Chats");
   const { data: allUsers } = useGetAllUserQuery({});
+  const { user } = useAppSelector((state) => state.auth as any);
   const dispatch = useAppDispatch();
+
+  const filterUsers = allUsers?.data?.filter(
+    (userId: IUser) => userId._id !== user?.id
+  );
 
   return (
     <div className="w-full sticky top-0 left-0 min-h-screen max-h-screen border border-r border-r-gray-800">
@@ -67,7 +72,7 @@ const ChatSidebar = () => {
       </div>
 
       <div className="overflow-y-auto max-h-96">
-        {allUsers?.data?.map((user: IUser) => (
+        {filterUsers?.map((user: IUser) => (
           <div
             key={user._id}
             className="flex  p-3 cursor-pointer gap-2  border-b border-gray-700"

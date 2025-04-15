@@ -22,8 +22,6 @@ const Register = () => {
   const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
-
     const formData = new FormData();
 
     formData.append("data", JSON.stringify(data));

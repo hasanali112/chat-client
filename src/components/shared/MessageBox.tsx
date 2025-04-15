@@ -3,20 +3,23 @@ import { Button } from "@heroui/button";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import { useAppSelector } from "@/redux/hook";
+import { useCreateChatMutation } from "@/redux/features/chat/chatApi";
 
-const MessageBox = () => {
+const MessageBox = ({ onSend }: { onSend: () => void }) => {
   const { register, handleSubmit, reset } = useForm();
   const { user } = useAppSelector((state) => state.auth as any);
   const { receiverId } = useAppSelector((state) => state.chat);
+  const [createChat] = useCreateChatMutation();
 
-  const onsSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onsSubmit: SubmitHandler<FieldValues> = async (data) => {
     const messageData = {
-      senderId: user?.id,
-      receiverId: receiverId,
+      sender: user?.id,
+      receiver: receiverId,
       message: data.message,
     };
 
-    console.log(messageData);
+    await createChat(messageData);
+    onSend();
 
     reset();
   };

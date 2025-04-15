@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { useState } from "react";
 import {
   Search,
@@ -9,6 +11,8 @@ import {
 } from "lucide-react";
 
 import { useGetAllUserQuery } from "@/redux/features/auth/auth.api";
+import { useAppDispatch } from "@/redux/hook";
+import { addReceiverId } from "@/redux/features/chat/chatSlice";
 
 export interface IUser {
   _id: string;
@@ -24,7 +28,8 @@ export interface IUser {
 
 const ChatSidebar = () => {
   const [selectedFilter] = useState("All Chats");
-  const { data: allUsers, isLoading } = useGetAllUserQuery({});
+  const { data: allUsers } = useGetAllUserQuery({});
+  const dispatch = useAppDispatch();
 
   return (
     <div className="w-full sticky top-0 left-0 min-h-screen max-h-screen border border-r border-r-gray-800">
@@ -66,6 +71,7 @@ const ChatSidebar = () => {
           <div
             key={user._id}
             className="flex  p-3 cursor-pointer gap-2  border-b border-gray-700"
+            onClick={() => dispatch(addReceiverId(user._id))}
           >
             <div className="relative">
               <img

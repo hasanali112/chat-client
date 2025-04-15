@@ -13,18 +13,26 @@ import storage from "redux-persist/lib/storage";
 
 import { baseApi } from "./api/baseApi";
 import authReducer from "./features/auth/auth.slice";
+import chatReducer from "./features/chat/chatSlice";
 
 const persistConfig = {
   key: "auth",
   storage,
 };
 
+const persistConfigChat = {
+  key: "chat",
+  storage,
+};
+
 const authPersistReducer = persistReducer(persistConfig, authReducer);
+const chatPersistReducer = persistReducer(persistConfigChat, chatReducer);
 
 export const store = configureStore({
   reducer: {
     [baseApi.reducerPath]: baseApi.reducer,
     auth: authPersistReducer,
+    chat: chatPersistReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -5,7 +5,7 @@ import { Button } from "@heroui/button";
 import { useForm, SubmitHandler, FieldValues } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
 import { X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { useRegisterUserMutation } from "@/redux/features/auth/auth.api";
@@ -17,8 +17,9 @@ const Register = () => {
   const { register, handleSubmit, reset } = useForm<FieldValues>();
   const [imageFile, setImageFile] = useState<File[] | []>([]);
   const [imagePreviews, setImagePreviews] = useState<string[] | []>([]);
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     console.log(data);
@@ -37,6 +38,9 @@ const Register = () => {
       dispatch(setUser({ user: user, token: res.data.accessToken }));
 
       toast.success("Logged in", { duration: 2000 });
+      if (res.data.accessToken) {
+        navigate("/");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -187,6 +191,7 @@ const Register = () => {
           </div>
 
           <Button
+            isLoading={isLoading}
             className="mt-4 py-6 text-lg font-medium hover:scale-[1.02] transition-transform"
             color="primary"
             size="lg"
